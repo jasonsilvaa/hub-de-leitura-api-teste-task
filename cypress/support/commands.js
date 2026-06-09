@@ -38,17 +38,50 @@ Cypress.Commands.add('geraToken', (email, senha) => {
     })
  })
 
- Cypress.Commands.add('cadastrarUsuario', (nome, email, senha) =>{
-        cy.api({
-            method: 'POST',
-            url: 'users',
-            body: {
-                "name": nome,
-                "email": email,
-                "password": senha
-            }
-        }).then(response => {
-            expect(response.status).to.equal(201)
-            return response.body.user.id
-        })
- })
+Cypress.Commands.add('cadastrarUsuario', (nome, email, senha) => {
+    cy.api({
+        method: 'POST',
+        url: 'users',
+        body: {
+            name: nome,
+            email: email,
+            password: senha
+        }
+    }).then(response => {
+        expect(response.status).to.equal(201)
+        return response.body.user.id
+    })
+})
+
+Cypress.Commands.add('cadastrarLivro', (token, dados = {}) => {
+    const livro = {
+        title: `Livro Teste ${Date.now()}`,
+        author: 'Autor Teste',
+        description: 'Descrição de teste',
+        category: 'Ficção',
+        isbn: `978-${Date.now()}`,
+        editor: 'Editora Teste',
+        language: 'Português',
+        publication_year: 2024,
+        pages: 200,
+        format: 'Físico',
+        total_copies: 3,
+        available_copies: 3,
+        cover_image: 'test.jpg',
+        ...dados
+    }
+
+    cy.api({
+        method: 'POST',
+        url: 'books',
+        headers: { 'Authorization': token },
+        body: livro
+    }).then(response => {
+        expect(response.status).to.equal(201)
+        return {
+            id: response.body.book.id,
+            titulo: livro.title,
+            livro: response.body.book
+        }
+    })
+})

@@ -1,113 +1,104 @@
 # 📚 Hub de Leitura - API Teste Task
 
-Projeto de testes automatizados com Cypress para a API do Catálogo de Livros. Este projeto foi desenvolvido como exercício prático para testar uma API REST de gerenciamento de livros.
+Projeto de testes automatizados com Cypress para a API do **Catálogo de Livros** do Hub de Leitura. Exercício prático de automação de testes de API REST (EBAC).
+
+**Repositório:** [github.com/jasonsilvaa/hub-de-leitura-api-teste-task](https://github.com/jasonsilvaa/hub-de-leitura-api-teste-task)
 
 ## 📋 Pré-requisitos
 
 - Node.js (v14 ou superior)
 - npm ou yarn
 - Git
+- **Servidor Hub de Leitura** rodando em `http://localhost:3000` (API em `/api/`)
 
-## 🚀 Como Baixar o Projeto
+## 🚀 Como baixar o projeto
 
 ```bash
-git clone https://github.com/EBAC-QE/hub-de-leitura-api-teste-task.git
+git clone https://github.com/jasonsilvaa/hub-de-leitura-api-teste-task.git
 cd hub-de-leitura-api-teste-task
 ```
 
-## 📦 Instalação
+> O projeto original do exercício está em [EBAC-QE/hub-de-leitura-api-teste-task](https://github.com/EBAC-QE/hub-de-leitura-api-teste-task).
 
-Após clonar o repositório, instale as dependências do projeto:
+## 📦 Instalação
 
 ```bash
 npm install
 ```
 
-Isso instalará o Cypress e todas as dependências necessárias definidas no `package.json`.
+Isso instala o Cypress, o plugin `cypress-plugin-api` e as demais dependências do `package.json`.
 
-## 🏗️ Estrutura do Projeto
+## ⚙️ Servidor da API
+
+Antes de executar os testes, suba o servidor **Hub de Leitura** localmente. A `baseUrl` do Cypress está configurada em:
+
+`http://localhost:3000/api/`
+
+Verifique se a API está no ar:
+
+```bash
+curl http://localhost:3000/api/health
+```
+
+## 🏗️ Estrutura do projeto
 
 ```
 .
 ├── cypress/
 │   ├── e2e/
-│   │   ├── exercicio.cy.js      # Arquivo com os testes a serem implementados
+│   │   ├── exercicio.cy.js      # Testes do Catálogo de Livros (implementados)
 │   │   └── usuarios.cy.js       # Exemplo de testes de usuários
 │   ├── fixtures/
-│   │   └── example.json         # Dados de teste (fixtures)
+│   │   └── example.json
 │   └── support/
-│       ├── commands.js          # Comandos customizados do Cypress
-│       └── e2e.js              # Configurações de suporte
-├── cypress.config.js            # Configuração do Cypress
-├── package.json                 # Dependências do projeto
-└── README.md                    # Este arquivo
+│       ├── commands.js          # cy.geraToken(), cy.cadastrarUsuario(), cy.cadastrarLivro()
+│       └── e2e.js
+├── cypress.config.js
+├── package.json
+└── readme.md
 ```
 
-## 📝 Como Executar os Testes
+## 📝 Como executar os testes
 
-### Executar todos os testes (modo headless)
+### Todos os testes (headless)
 
 ```bash
 npm test
 ```
 
-### Executar testes com a interface do Cypress (modo interativo)
+### Interface interativa do Cypress
 
 ```bash
-npm run cypress:open
+npx cypress open
 ```
 
-Isso abrirá a interface do Cypress onde você pode:
-- Visualizar os testes
-- Executá-los interativamente
-- Depurar erros em tempo real
-- Ver o comportamento da aplicação
-
-### Executar um arquivo de teste específico
+### Apenas o exercício do catálogo de livros
 
 ```bash
 npx cypress run --spec "cypress/e2e/exercicio.cy.js"
 ```
 
-## ✏️ Como Fazer o Exercício
+## ✅ Cenários automatizados
 
-O arquivo [cypress/e2e/exercicio.cy.js](cypress/e2e/exercicio.cy.js) contém 6 testes para a API de Catálogo de Livros que precisam ser implementados:
+Os 6 cenários em [cypress/e2e/exercicio.cy.js](cypress/e2e/exercicio.cy.js) estão implementados:
 
-### 1️⃣ **GET - Deve listar livros com filtros e paginação**
-- **Objetivo:** Verificar que a API retorna lista de livros com filtros por categoria e autores funcionando
-- **O que fazer:** Fazer uma requisição GET para `/api/books` com parâmetros de filtro
-- **Validações:** Verificar status 200, estrutura de resposta, paginação funcionando
+| # | Cenário | Método | Validações principais |
+|---|---------|--------|------------------------|
+| 1 | Listar livros com filtros e paginação | `GET /books` | Status 200, `books`, `pagination`, filtros por `category` e `author` |
+| 2 | Obter detalhes de um livro | `GET /books/4` | Status 200, campos do `book`, `availability` e `statistics` |
+| 3 | Cadastrar novo livro | `POST /books` | Status 201, mensagem de sucesso, `id` e dados do livro |
+| 4 | Rejeitar dados inválidos | `POST /books` | Status 400, mensagem e campo de erro (`title`) |
+| 5 | Atualizar livro cadastrado | `PUT /books/{id}` | Cria livro → atualiza → status 200 e mensagem de sucesso |
+| 6 | Deletar livro cadastrado | `DELETE /books/{id}` | Cria livro → remove → status 200 e `deletedBook` |
 
-### 2️⃣ **GET - Deve obter detalhes de um livro específico**
-- **Objetivo:** Validar que é possível obter detalhes de um livro específico pelo ID
-- **O que fazer:** Fazer uma requisição GET para `/api/books/{id}` com um ID válido
-- **Validações:** Verificar status 200, todos os campos do livro retornados
+**Detalhes da implementação:**
 
-### 3️⃣ **POST - Deve cadastrar um novo livro com sucesso**
-- **Objetivo:** Validar que um novo livro é adicionado com sucesso ao catálogo
-- **O que fazer:** Fazer uma requisição POST para `/api/books` com dados válidos do livro
-- **Validações:** Verificar status 201, livro criado com ID, apenas admin pode criar
-
-### 4️⃣ **POST - Deve rejeitar livro com dados inválidos**
-- **Objetivo:** Garantir que dados inválidos são rejeitados
-- **O que fazer:** Fazer uma requisição POST para `/api/books` com dados faltantes ou incorretos
-- **Validações:** Verificar status 400 ou erro apropriado, mensagem de erro clara
-
-### 5️⃣ **PUT - Deve atualizar um livro previamente cadastrado**
-- **Objetivo:** Validar que um livro pode ser atualizado com sucesso
-- **O que fazer:** Fazer uma requisição PUT para `/api/books/{id}` com novos dados
-- **Validações:** Verificar status 200, livro atualizado corretamente, apenas admin pode editar
-
-### 6️⃣ **DELETE - Deve deletar um livro previamente cadastrado**
-- **Objetivo:** Validar que um livro pode ser removido do catálogo
-- **O que fazer:** Fazer uma requisição DELETE para `/api/books/{id}`
-- **Validações:** Verificar status 200, livro removido, apenas admin pode deletar
+- Autenticação com `cy.geraToken('admin@biblioteca.com', 'admin123')` no `beforeEach`
+- Requisições via `cy.api()` (plugin `cypress-plugin-api`)
+- Comando customizado `cy.cadastrarLivro(token, dados)` para cadastro reutilizável nos cenários de PUT e DELETE
+- Dados dinâmicos com `Date.now()` em título/ISBN para evitar conflito em reexecuções
 
 ## 🔑 Autenticação
-
-O projeto já possui um comando customizado `cy.geraToken()` que gera um token JWT para autenticação. 
-
-No seu teste, use:
 
 ```javascript
 let token
@@ -118,7 +109,7 @@ beforeEach(() => {
 });
 ```
 
-Isso obterá um token que pode ser usado nas requisições que exigem autenticação (POST, PUT, DELETE).
+Use o token no header `Authorization` nas requisições que exigem perfil admin (POST, PUT, DELETE).
 
 ## 📚 Endpoints da API
 
@@ -132,31 +123,33 @@ Isso obterá um token que pode ser usado nas requisições que exigem autentica�
 | GET | `/api/books/categories` | Listar categorias |
 | GET | `/api/books/authors` | Listar autores |
 
-## 💡 Dicas para Implementar os Testes
+## 💡 Boas práticas utilizadas
 
-1. **Use `cy.request()`** para fazer requisições HTTP
-2. **Use `.should()`** para validações
-3. **Use `cy.intercept()`** para mockar respostas se necessário
-4. **Estruture seus dados** em fixtures para melhor organização
-5. **Use `beforeEach()`** para setup comum entre testes
-6. **Valide status code, headers e body** das respostas
+1. **`cy.api()`** para requisições HTTP com relatório visual no Cypress
+2. **`.should()`** com callbacks para asserções no body da resposta
+3. **`failOnStatusCode: false`** em cenários de erro esperado (400)
+4. **`beforeEach()`** para setup comum (token)
+5. **Dados únicos por execução** em cadastros para testes estáveis e repetíveis
 
 ## 🐛 Troubleshooting
 
-- **Testes falhando por autenticação?** Verifique se o comando `cy.geraToken()` está funcionando
-- **Erro de conexão?** Certifique-se de que o servidor da API está rodando
-- **Imports não encontrados?** Execute `npm install` novamente
+| Problema | Solução |
+|----------|---------|
+| Falha de autenticação | Confirme `cy.geraToken()` e credenciais do admin |
+| Erro de conexão / ECONNREFUSED | Suba o Hub de Leitura em `localhost:3000` |
+| POST falha na 2ª execução | Título/ISBN devem ser únicos (já tratado com `Date.now()`) |
+| Módulos não encontrados | Execute `npm install` novamente |
 
-## 📖 Documentação Útil
+## 📖 Documentação útil
 
-- [Cypress Official Docs](https://docs.cypress.io/)
+- [Cypress Docs](https://docs.cypress.io/)
+- [cypress-plugin-api](https://github.com/filiphric/cypress-plugin-api)
 - [Cypress cy.request()](https://docs.cypress.io/api/commands/request)
-- [Testing REST APIs](https://docs.cypress.io/guides/end-to-end-testing/testing-your-app)
 
 ## 👨‍💻 Autor
 
-Desenvolvido como exercício prático de testes de API com Cypress.
+**Jason Silva** — Exercício EBAC · Automação de testes de API com Cypress.
 
 ---
 
-**Boa sorte com os testes! 🚀**
+Projeto base: [EBAC-QE/hub-de-leitura-api-teste-task](https://github.com/EBAC-QE/hub-de-leitura-api-teste-task)

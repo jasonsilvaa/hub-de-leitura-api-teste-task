@@ -121,32 +121,19 @@ describe('Testes da Funcionalidade Catálogo de Livros', () => {
      // Objetivo: Validar que um livro pode ser atualizado com sucesso
      // Verificar que apenas admin pode atualizar livros (validação de permissão)
      it('PUT - Deve atualizar um livro previamente cadastrado', () => {
-          const tituloOriginal = `Livro para Atualizar ${Date.now()}`
-          const isbn = `978-put-${Date.now()}`
-          cy.api({
-               method: 'POST',
-               url: 'books',
-               headers: { 'Authorization': token },
-               body: {
-                    title: tituloOriginal,
-                    author: 'Autor Original',
-                    description: 'Descrição original',
-                    category: 'Ficção',
-                    isbn: isbn,
-                    editor: 'Editora Teste',
-                    language: 'Português',
-                    publication_year: 2020,
-                    pages: 150,
-                    format: 'Físico',
-                    total_copies: 2,
-                    available_copies: 2,
-                    cover_image: 'put-test.jpg'
-               }
-          }).then(response => {
-               const bookId = response.body.book.id
+          cy.cadastrarLivro(token, {
+               title: `Livro para Atualizar ${Date.now()}`,
+               author: 'Autor Original',
+               isbn: `978-put-${Date.now()}`,
+               publication_year: 2020,
+               pages: 150,
+               total_copies: 2,
+               available_copies: 2,
+               cover_image: 'put-test.jpg'
+          }).then(({ id }) => {
                cy.api({
                     method: 'PUT',
-                    url: `books/${bookId}`,
+                    url: `books/${id}`,
                     headers: { 'Authorization': token },
                     body: {
                          title: 'Livro Atualizado Cypress',
@@ -155,7 +142,7 @@ describe('Testes da Funcionalidade Catálogo de Livros', () => {
                }).should(putResponse => {
                     expect(putResponse.status).to.equal(200)
                     expect(putResponse.body.message).to.equal('Livro atualizado com sucesso.')
-                    expect(putResponse.body.bookId).to.equal(bookId)
+                    expect(putResponse.body.bookId).to.equal(id)
                })
           })
      });
@@ -163,38 +150,26 @@ describe('Testes da Funcionalidade Catálogo de Livros', () => {
      // Objetivo: Validar que um livro pode ser removido do catálogo
      // Verificar que apenas admin pode deletar livros (validação de permissão)
      it('DELETE - Deve deletar um livro previamente cadastrado', () => {
-          const tituloDeletar = `Livro para Deletar ${Date.now()}`
-          const isbn = `978-del-${Date.now()}`
-          cy.api({
-               method: 'POST',
-               url: 'books',
-               headers: { 'Authorization': token },
-               body: {
-                    title: tituloDeletar,
-                    author: 'Autor Deletar',
-                    description: 'Descrição para exclusão',
-                    category: 'Ficção',
-                    isbn: isbn,
-                    editor: 'Editora Teste',
-                    language: 'Português',
-                    publication_year: 2021,
-                    pages: 100,
-                    format: 'Físico',
-                    total_copies: 1,
-                    available_copies: 1,
-                    cover_image: 'del-test.jpg'
-               }
-          }).then(response => {
-               const bookId = response.body.book.id
+          cy.cadastrarLivro(token, {
+               title: `Livro para Deletar ${Date.now()}`,
+               author: 'Autor Deletar',
+               description: 'Descrição para exclusão',
+               isbn: `978-del-${Date.now()}`,
+               publication_year: 2021,
+               pages: 100,
+               total_copies: 1,
+               available_copies: 1,
+               cover_image: 'del-test.jpg'
+          }).then(({ id, titulo }) => {
                cy.api({
                     method: 'DELETE',
-                    url: `books/${bookId}`,
+                    url: `books/${id}`,
                     headers: { 'Authorization': token }
                }).should(deleteResponse => {
                     expect(deleteResponse.status).to.equal(200)
                     expect(deleteResponse.body.message).to.equal('Livro deletado com sucesso.')
-                    expect(deleteResponse.body.deletedBook.id).to.equal(bookId)
-                    expect(deleteResponse.body.deletedBook.title).to.equal(tituloDeletar)
+                    expect(deleteResponse.body.deletedBook.id).to.equal(id)
+                    expect(deleteResponse.body.deletedBook.title).to.equal(titulo)
                })
           })
      });
